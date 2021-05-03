@@ -21,6 +21,7 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.LineSeparator;
@@ -36,10 +37,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
+    OutputStream outputStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,13 @@ public class MainActivity extends AppCompatActivity {
                                 createPDFFile(Common.getAppPath(MainActivity.this) + "test_pdf.pdf");
                             }
                         });
+
+                        binding.printPdf.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                printPDF2();
+                            }
+                        });
                     }
 
                     @Override
@@ -75,6 +85,16 @@ public class MainActivity extends AppCompatActivity {
                 .check();
     }
 
+    private void printPDF2() {
+        try{
+            String msg = binding.printPdf.getText().toString();
+            msg+="\n";
+            outputStream.write(msg.getBytes());
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
     private void createPDFFile(String path) {
         if (new File(path).exists())
             new File(path).delete();
@@ -87,7 +107,8 @@ public class MainActivity extends AppCompatActivity {
             document.open();
 
             //setting
-            document.setPageSize(PageSize.A4);
+            Rectangle pagesize = new Rectangle(58, 160);
+            document.setPageSize(pagesize);
             document.addCreationDate();
             document.addAuthor("Hovata Technologies");
             document.addCreator("Bipul Islam");
@@ -124,13 +145,13 @@ public class MainActivity extends AppCompatActivity {
 
 
             addNewItem(document, "Account Name:", Element.ALIGN_LEFT, orderNumberFont);
-            addNewItem(document, "Eddy Lee", Element.ALIGN_LEFT, orderNumberFont);
+            addNewItem(document, "Bipul Islam", Element.ALIGN_LEFT, orderNumberFont);
 
             addLineSeparator(document);
 
             //add product order detail
             addLineSpace(document);
-            addNewItem(document, "Product Detail", Element.ALIGN_CENTER, titleFont);
+            addNewItem(document, "Product Details", Element.ALIGN_CENTER, titleFont);
             addLineSeparator(document);
 
 
@@ -157,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
             
-            printPDF();
+            //printPDF();
 
 
 
@@ -184,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void addNewItemWithLeftAndRight(Document document, String textLeft, String textRight, Font textFontLeft, Font textRightFont) throws DocumentException {
         Chunk chunkTextLeft = new Chunk(textLeft, textFontLeft);
-        Chunk chunkTextRight = new Chunk(textLeft, textRightFont);
+        Chunk chunkTextRight = new Chunk(textRight, textRightFont);
 
         Paragraph p = new Paragraph(chunkTextLeft);
         p.add(new Chunk(new VerticalPositionMark()));
